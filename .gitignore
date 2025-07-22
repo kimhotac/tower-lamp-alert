@@ -22,5 +22,43 @@ venv/
 # VSCode 관련
 .vscode/
 
+# Visual Studio 관련
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# 빌드 출력
+[Bb]in/
+[Oo]bj/
+*.exe
+*.dll
+*.pdb
+*.cache
+*.log
+
+# NuGet 관련
+*.nupkg
+packages/
+project.lock.json
+project.fragment.lock.json
+
+# Rider (JetBrains IDE) 사용자일 경우
+.idea/
+
+# 환경설정/백업 파일
+*.swp
+*.bak
+*.tmp
+
+# 기타 무시할 수 있는 파일
+*.vspscc
+*.vssscc
+*.dbmdl
+*.sql
+*.orig
+
+
 # 기타
 .DS_Store
