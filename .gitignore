@@ -1,0 +1,26 @@
+# C# 관련
+*.exe
+*.dll
+*.obj
+*.pdb
+*.user
+*.suo
+*.cache
+*.csproj.user
+bin/
+obj/
+
+# Python 관련
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.env
+venv/
+.envrc
+
+# VSCode 관련
+.vscode/
+
+# 기타
+.DS_Store
