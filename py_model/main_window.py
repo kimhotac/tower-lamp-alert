@@ -11,7 +11,7 @@ class MainWindow(QWidget):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("ROI 선택, 이동, 삭제 + 예측 표시")
-        self.resize(900, 600)
+        self.resize(1000, 500)
 
         self.video_widget = VideoWidget()
         self.roi_list_widget = ROIListWidget()
