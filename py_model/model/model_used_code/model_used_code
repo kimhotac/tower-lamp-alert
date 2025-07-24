@@ -1,0 +1,57 @@
+import torch
+import torch.nn as nn
+from torchvision import transforms, models
+from PIL import Image
+
+# -------------------------
+# [1] 설정
+# -------------------------
+IMG_SIZE = 224
+device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+model_path = r"C:\Users\Users\efficientnet_led_classifier.pth" # 모델 경로, 본인의 컴퓨터에 맞게 수정
+class_names = ['off', 'green', 'yellow', 'red']  # 0,1,2,3
+
+# -------------------------
+# [2] 전처리 transform 정의
+# -------------------------
+transform = transforms.Compose([
+    transforms.Resize((IMG_SIZE, IMG_SIZE)),
+    transforms.ToTensor(),
+    transforms.Normalize([0.485, 0.456, 0.406],
+                         [0.229, 0.224, 0.225])
+])
+
+# -------------------------
+# [3] 모델 로딩
+# -------------------------
+model = models.efficientnet_b0(pretrained=False)
+model.classifier[1] = nn.Linear(model.classifier[1].in_features, 4)
+model.load_state_dict(torch.load(model_path, map_location=device))
+model.to(device)
+model.eval()
+
+# -------------------------
+# [4] 예측 함수 정의
+# -------------------------
+def predict_led_image(image_path):
+    try:
+        image = Image.open(image_path).convert('RGB')
+    except Exception as e:
+        print(f"❌ 이미지 불러오기 실패: {e}")
+        return
+
+    # 전처리
+    input_tensor = transform(image).unsqueeze(0).to(device)
+
+    # 모델 추론
+    with torch.no_grad():
+        output = model(input_tensor)
+        pred_class = torch.argmax(output, dim=1).item()
+
+    print(f"🔎 예측 결과: {class_names[pred_class]} ({pred_class})")
+
+# -------------------------
+# [5] 실행 예시
+# -------------------------
+image_path = r"C:\Users\Users\crop_seperated\ecd1c91a-IMG_2674_2.jpg"  # 크롭된 LED 이미지 경로
+predict_led_image(image_path)
