@@ -1,11 +1,21 @@
 from PyQt5.QtWidgets import QWidget, QHBoxLayout, QVBoxLayout, QPushButton
 from PyQt5.QtCore import QTimer, QRect
-from PyQt5.QtGui import QIcon
+import time
 
 from video_widget import VideoWidget
 from roi_list_widget import ROIListWidget
 from video_capture import VideoCaptureHandler
 from detection import detect
+from util.email_notifier import EmailNotifier
+
+last_alert_time = 0  # 최초 알림 시간 (0초부터 시작)
+ALERT_COOLDOWN = 600  # 10분 (초 단위)
+
+notifier = EmailNotifier(
+    sender_email='asho27695193@gmail.com',           # 실제 Gmail 주소
+    sender_password=''            # 2단계 인증이 끝난 실제 Gmail 앱 비밀번호를 생성 후 해당하는 비밀번호 입력
+)                                                 # 실제 계정 비밀번호와는 다르다.
+
 
 class MainWindow(QWidget):
     def __init__(self):
@@ -40,6 +50,8 @@ class MainWindow(QWidget):
         self.roi_list_widget.roi_deleted.connect(self.video_widget.delete_roi)
 
     def detect_all_rois(self):
+        global last_alert_time
+
         frame = self.video_widget.frame
         if frame is None:
             return
@@ -51,6 +63,13 @@ class MainWindow(QWidget):
 
             roi_img = frame[y:y + h, x:x + w]
             result = detect(roi_img)
+
+            # 알림 쿨타임 확인
+            current_time = time.time()
+            if result == 'red' and (current_time - last_alert_time) > ALERT_COOLDOWN:
+                notifier.send_alert()
+                last_alert_time = current_time  # 마지막 알림 시간 갱신
+
             self.roi_list_widget.update_prediction(i, result)
 
     def closeEvent(self, event):
