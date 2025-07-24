@@ -5,7 +5,7 @@ import cv2
 from torchvision import models, transforms
 
 # 모델 설정
-MODEL_PATH = r"C:\Users\JH\Documents\GitHub\tower-lamp-alert\py_model\model\MobileNetV2\mobilenetv2_pytorch.pth"
+MODEL_PATH = r"model\MobileNetV2\mobilenetv2_pytorch.pth"
 class_labels = ['off', 'green', 'yellow', 'red']
 num_classes = len(class_labels)
 model = models.mobilenet_v2(weights=None)
