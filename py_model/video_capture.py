@@ -4,7 +4,7 @@ from PyQt5.QtCore import QTimer, pyqtSignal, QObject
 class VideoCaptureHandler(QObject):
     frame_captured = pyqtSignal(object)
 
-    def __init__(self, cam_index=1):
+    def __init__(self, cam_index=0):
         super().__init__()
         self.cap = cv2.VideoCapture(cam_index)
         self.timer = QTimer(self)
