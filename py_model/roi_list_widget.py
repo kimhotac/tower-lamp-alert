@@ -51,3 +51,5 @@ class ROIListWidget(QListWidget):
     @staticmethod
     def _format_roi(rect: QRect):
         return f"ROI - x:{rect.x()}, y:{rect.y()}, w:{rect.width()}, h:{rect.height()}"
+
+
