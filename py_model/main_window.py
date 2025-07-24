@@ -1,6 +1,5 @@
-import random
-from PyQt5.QtWidgets import QWidget, QHBoxLayout, QVBoxLayout
-from PyQt5.QtCore import QTimer
+from PyQt5.QtWidgets import QWidget, QHBoxLayout, QVBoxLayout, QPushButton
+from PyQt5.QtCore import QTimer, QRect
 import time
 
 from video_widget import VideoWidget
@@ -21,7 +20,8 @@ notifier = EmailNotifier(
 class MainWindow(QWidget):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("ROI 선택, 이동, 삭제 + 예측 표시")
+        self.setWindowTitle("번쩍이 3000")
+        self.setWindowIcon(QIcon('icon.png'))
         self.resize(1000, 500)
 
         self.video_widget = VideoWidget()
