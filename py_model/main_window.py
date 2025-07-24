@@ -14,7 +14,7 @@ ALERT_COOLDOWN = 600  # 10분 (초 단위)
 
 notifier = EmailNotifier(
     sender_email='asho27695193@gmail.com',           # 실제 Gmail 주소
-    sender_password='gyccdpkrkoqcthgy'            # 2단계 인증이 끝난 실제 Gmail 앱 비밀번호를 생성 후 해당하는 비밀번호 입력
+    sender_password=''            # 2단계 인증이 끝난 실제 Gmail 앱 비밀번호를 생성 후 해당하는 비밀번호 입력
 )                                                 # 실제 계정 비밀번호와는 다르다.
 
 
