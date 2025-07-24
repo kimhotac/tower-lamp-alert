@@ -1,6 +1,5 @@
-import random
-from PyQt5.QtWidgets import QWidget, QHBoxLayout, QVBoxLayout
-from PyQt5.QtCore import QTimer
+from PyQt5.QtWidgets import QWidget, QHBoxLayout, QVBoxLayout, QPushButton
+from PyQt5.QtCore import QTimer, QRect
 
 from video_widget import VideoWidget
 from roi_list_widget import ROIListWidget
@@ -29,7 +28,13 @@ class MainWindow(QWidget):
         layout.addWidget(self.video_widget)
 
         side_layout = QVBoxLayout()
+
+        self.add_roi_button = QPushButton("ROI 추가")
+        self.add_roi_button.clicked.connect(self.video_widget.auto_add_roi)
+
+        side_layout.addWidget(self.add_roi_button)
         side_layout.addWidget(self.roi_list_widget)
+
         layout.addLayout(side_layout)
 
     def connect_signals(self):

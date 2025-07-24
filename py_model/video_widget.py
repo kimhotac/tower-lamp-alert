@@ -1,7 +1,7 @@
 from PyQt5.QtWidgets import QLabel
 from PyQt5.QtCore import QRect, pyqtSignal, Qt
 from PyQt5.QtGui import QImage, QPixmap, QPainter, QColor, QPen
-
+from ultralytics import YOLO
 class VideoWidget(QLabel):
     roi_created = pyqtSignal(QRect)
     roi_updated = pyqtSignal(int, QRect)
@@ -17,6 +17,7 @@ class VideoWidget(QLabel):
         self.start_point = None
         self.end_point = None
         self.frame = None
+        self.model = YOLO("model/YoLo/model.pt")
 
     def set_frame(self, frame):
         self.frame = frame.copy()
@@ -83,3 +84,33 @@ class VideoWidget(QLabel):
 
         painter.end()
         self.setPixmap(pixmap)
+
+    def auto_add_roi(self):
+        """YOLOv8로 감지된 모든 객체를 ROI로 자동 추가"""
+        if self.frame is None:
+            return
+
+        # BGR → RGB 변환
+        rgb_frame = self.frame[..., ::-1]
+
+        # YOLOv8 예측 실행 (결과는 list, 첫 번째 결과 사용)
+        results = self.model.predict(rgb_frame, verbose=False)[0]
+
+        # 감지된 모든 바운딩 박스에 대해 처리
+        added = 0
+        for box in results.boxes:
+            # 바운딩 박스 좌표 (xyxy): tensor([[x1, y1, x2, y2]])
+            x1, y1, x2, y2 = box.xyxy[0].tolist()
+            x1, y1, x2, y2 = int(x1), int(y1), int(x2), int(y2)
+            w = x2 - x1
+            h = y2 - y1
+
+            if w < 10 or h < 10:
+                continue  # 너무 작은 ROI는 무시
+
+            rect = QRect(x1, y1, w, h)
+            self.roi_list.append(rect)
+            self.roi_created.emit(rect)
+            added += 1
+
+        self.update()
