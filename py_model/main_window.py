@@ -1,6 +1,7 @@
 from PyQt5.QtWidgets import QWidget, QHBoxLayout, QVBoxLayout, QPushButton
 from PyQt5.QtCore import QTimer, QRect
 import time
+from PyQt5.QtGui import QIcon
 
 from video_widget import VideoWidget
 from roi_list_widget import ROIListWidget
