@@ -1,1 +1,0 @@
-Best Accuracy: 0.98693
