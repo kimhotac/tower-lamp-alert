@@ -61,4 +61,6 @@ project.fragment.lock.json
 
 
 # 기타
-.DS_Store
+.DS_Storepy_model/model/opencv/label/**/*.jpg
+py_model/model/opencv/label/**/*.jpeg
+py_model/model/opencv/label/**/*.png
