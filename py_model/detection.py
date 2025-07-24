@@ -11,23 +11,17 @@ def detect(roi_image):
     if roi_image is None:
         return 'off'
     
-    try:
-        # 1. 140개 특징 추출 (4가지 전처리 병렬)
-        features = extract_140_features(roi_image)
-        
-        # 2. 모델 로드 및 예측
-        model = load_lgbm_model()
-        if model is not None:
-            prediction = model.predict([features])[0]
-            label_map = {0: 'off', 1: 'green', 2: 'yellow', 3: 'red'}
-            return label_map.get(prediction, 'off')
-        else:
-            # 모델 로드 실패시 간단한 규칙 기반 판단
-            return simple_rule_detection(features)
-            
-    except Exception as e:
-        print(f"Detection error: {e}")
-        return 'off'
+    # 1. 140개 특징 추출 (4가지 전처리 병렬)
+    features = extract_140_features(roi_image)
+    
+    # 2. 모델 로드 및 예측 (필수)
+    model = load_lgbm_model()
+    if model is None:
+        raise RuntimeError("❌ ML 모델을 로드할 수 없습니다. 모델 파일이 존재하는지 확인하세요.")
+    
+    prediction = model.predict([features])[0]
+    label_map = {0: 'off', 1: 'green', 2: 'yellow', 3: 'red'}
+    return label_map.get(prediction, 'off')
 
 
 def extract_140_features(image):
@@ -35,13 +29,10 @@ def extract_140_features(image):
     노트북의 apply_parallel_preprocessing과 100% 동일한 4가지 전처리 특징 추출
     순서: 원본 → CLAHE → 블러 → HSV (각 35개씩, 총 140개)
     """
-    # 기본 100x100 리사이징 (노트북과 동일)
-    base_img = cv2.resize(image, (100, 100))
-    
     all_features = []
     
     # 1. 원본 (리사이징만) - 35개 특징
-    all_features.extend(extract_35_features(base_img))
+    all_features.extend(extract_35_features(image))
     
     # 2. CLAHE 전처리 (원본 이미지에 적용) - 35개 특징  
     clahe_img = apply_clahe(image)  # 원본 이미지에 적용
@@ -161,8 +152,7 @@ def extract_35_features(image):
 
 def apply_clahe(image):
     """CLAHE 전처리 (노트북과 100% 동일)"""
-    img = cv2.resize(image, (100, 100))
-    lab = cv2.cvtColor(img, cv2.COLOR_BGR2LAB)
+    lab = cv2.cvtColor(image, cv2.COLOR_BGR2LAB)
     l, a, b = cv2.split(lab)
     clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8, 8))
     cl = clahe.apply(l)
@@ -172,14 +162,12 @@ def apply_clahe(image):
 
 def apply_gaussian_blur(image):
     """가우시안 블러 전처리 (노트북과 100% 동일)"""
-    img = cv2.resize(image, (100, 100))
-    return cv2.GaussianBlur(img, (5, 5), 0.5)
+    return cv2.GaussianBlur(image, (5, 5), 0.5)
 
 
 def apply_hsv_boost(image, delta=10):
     """HSV 밝기 증가 전처리 (노트북과 100% 동일)"""
-    img = cv2.resize(image, (100, 100))
-    hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
+    hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
     hsv[:, :, 2] = np.clip(hsv[:, :, 2] + delta, 0, 255)
     return cv2.cvtColor(hsv, cv2.COLOR_HSV2BGR)
 
@@ -205,26 +193,3 @@ def load_lgbm_model():
                 _cached_model = None
     
     return _cached_model
-
-
-def simple_rule_detection(features):
-    """모델 실패시 간단한 규칙 기반 판단"""
-    if len(features) >= 140:
-        # 4가지 전처리별 평균 밝기 확인
-        orig_brightness = features[0]      # 원본 avg_brightness
-        clahe_brightness = features[35]    # CLAHE avg_brightness  
-        blur_brightness = features[70]     # 블러 avg_brightness
-        hsv_brightness = features[105]     # HSV avg_brightness
-        
-        avg_brightness = (orig_brightness + clahe_brightness + blur_brightness + hsv_brightness) / 4
-        
-        if avg_brightness < 60:
-            return 'off'
-        elif avg_brightness > 120:
-            return 'green'
-        else:
-            return 'red'
-    else:
-        # 35개 특징만 있는 경우
-        avg_brightness = features[0] if len(features) > 0 else 0
-        return 'off' if avg_brightness < 60 else 'green'
