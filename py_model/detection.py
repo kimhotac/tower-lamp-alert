@@ -7,7 +7,7 @@ import numpy as np
 
 # 모델과 관련 설정
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-model_path = r"py_model\model\efficientnet_led_classifier\efficientnet_led_classifier.pth"
+model_path = r"tower-lamp-alert\py_model\model\efficientnet_led_classifier\efficientnet_led_classifier.pth"
 
 # EfficientNet-B0 모델 불러오기, 클래스 4개로 맞춤
 model = models.efficientnet_b0(pretrained=False)
