@@ -8,7 +8,7 @@ class EmailNotifier:
         self.port = 465
         self.sender_email = sender_email
         self.sender_password = sender_password
-        self.receiver_email = 'asho227@naver.com'  # 여기를 고정 수신자로 지정
+        self.receiver_email = ''  # 여기를 고정 수신자로 지정
 
     def send_alert(self, subject='🚨 LED 상태 경고', body='빨간 LED가 감지되었습니다.'):
         try:
